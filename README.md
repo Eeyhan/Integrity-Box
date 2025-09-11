@@ -105,6 +105,7 @@
 
 # Configuration
 > You can control certain module features by configuring control center from WEBUI menu
+
 ![Flag](https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/DUMP/flag.png)
 
 # Emoji Results Meaning in module's description
