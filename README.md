@@ -98,16 +98,14 @@
   </tr>
   <tr>
     <td><img src="https://github.com/MeowDump/Integrity-Box/raw/main/DUMP/4.png" alt="10" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/raw/main/DUMP/module.png" alt="11" style="max-width: 100%; height: 2400;" /></td>
+    <td><img src="https://github.com/MeowDump/Integrity-Box/raw/main/DUMP/pif.png" alt="11" style="max-width: 100%; height: 2400;" /></td>
     <td><img src="https://github.com/MeowDump/Integrity-Box/raw/main/DUMP/1.png" alt="12" style="max-width: 100%; height: auto;" /></td>
   </tr>
 </table>
 
 # Configuration
-> You can control certain module features by creating specific config file in *`/data/adb/BrainBox`* folder
-- _create `stop` file to disable module toggle feature which switches between blacklist/whitelist modes (magisk only)_
-- _create `cam` file if you're facing camera app crash_
-- _create `stoptarget` to disable target.txt auto update on boot_
+> You can control certain module features by configuring control center from WEBUI menu
+![Flag](https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/DUMP/flag.png)
 
 # Emoji Results Meaning in module's description
 > The main purpose of adding these was to centralize all Play Integrity-related info in one place, so users can spot issues in their setup and fix them on their own, without feeling lost or relying on others. I even saw people on Telegram charging money for this... LOL.
