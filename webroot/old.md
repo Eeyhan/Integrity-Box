@@ -31,7 +31,6 @@
   </style>
 </head>
 <body>
-<!--
   <div id="intro-overlay">
     <div class="intro-border"></div>
     <div class="sparkles"></div>
@@ -40,7 +39,6 @@
       <div class="intro-subtext" id="intro-subtext"></div>
       <div class="intro-loader"></div>
     </div>
--->
   </div>
   <div class="container">
     <header class="title-bar">
@@ -91,36 +89,6 @@
 
     <main>
       <div class="button-group">
-        <h3 class="group-title">Play Integrity Fix</h3>
-        <div class="button-grid">
-          <button class="btn" data-script="pif.sh"><span class="icon material-symbols-outlined">science</span>Set Custom Fingerprint <div class="spinner"></div></button>
-<!--
-          <button class="btn" data-script="spoof.sh"><span class="icon material-symbols-outlined">wand_stars</span>Spoof/Unspoof PIF Injection values<div class="spinner"></div></button>
--->
-	 	  <button class="btn" data-script="piffork.sh" data-type="piffork"><span class="icon material-symbols-outlined">wand_stars</span>Spoof/Unspoof PIF Fork values<div class="spinner"></div></button>
-          <button class="btn" data-script="vending.sh"><span class="icon material-symbols-outlined">build_circle</span>FIX Device not Certified <div class="spinner"></div></button>
-          <button class="btn" data-script="kill.sh"><span class="icon material-symbols-outlined">swords</span>Kill GMS Process <div class="spinner"></div></button>
-        </div>
-      </div>
-
-      <div class="button-group">
-        <h3 class="group-title">Tricky Store</h3>
-        <div class="button-grid">
-<!--
-          <button class="btn" data-script="systemuser.sh" data-type="scanner"><span class="icon material-symbols-outlined">adb</span>Target All Apps <div class="spinner"></div></button>
--->
-          <button class="btn" data-script="key.sh"><span class="icon material-symbols-outlined">deployed_code_update</span>Update Keybox <div class="spinner"></div></button>
-          <button class="btn" data-script="user.sh" data-type="scanner"><span class="icon material-symbols-outlined">android</span>Target User Apps <div class="spinner"></div></button>
-<!--
-          <button class="btn" data-script="keybox.sh"><span class="icon material-symbols-outlined">vpn_key</span>Set Valid Keybox <div class="spinner"></div></button>
-          <button class="btn" data-script="aosp.sh"><span class="icon material-symbols-outlined">vpn_key_off</span>Set AOSP Keybox <div class="spinner"></div></button>
-          <button class="btn" data-script="patch.sh"><span class="icon material-symbols-outlined">security</span>Spoof Tricky Patch <div class="spinner"></div></button>
--->
-		  <button class="btn" data-script="banned.sh"><span class="icon material-symbols-outlined">dangerous</span>Banned Keybox List <div class="spinner"></div></button>
-        </div>
-      </div>
-
-      <div class="button-group">
         <h3 class="group-title">Shamiko & NoHello</h3>
         <div class="button-grid">
           <button class="btn" data-script="start.sh"><span class="icon material-symbols-outlined">toggle_on</span>Enable Auto-Whitelist <div class="spinner"></div></button>
@@ -129,6 +97,30 @@
       </div>
 	  
       <div class="button-group">
+        <h3 class="group-title">Play Integrity Fix</h3>
+        <div class="button-grid">
+          <button class="btn" data-script="pif.sh"><span class="icon material-symbols-outlined">science</span>Set Custom Fingerprint <div class="spinner"></div></button>
+          <button class="btn" data-script="spoof.sh"><span class="icon material-symbols-outlined">wand_stars</span>Spoof/Unspoof PIF Injection values<div class="spinner"></div></button>
+	 	  <button class="btn" data-script="piffork.sh" data-type="piffork"><span class="icon material-symbols-outlined">wand_stars</span>Spoof/Unspoof PIF Fork values<div class="spinner"></div></button>
+          <button class="btn" data-script="kill.sh"><span class="icon material-symbols-outlined">swords</span>Kill GMS Process <div class="spinner"></div></button>
+          <button class="btn" data-script="vending.sh"><span class="icon material-symbols-outlined">build_circle</span>FIX Device not Certified <div class="spinner"></div></button>
+		  <button class="btn" data-script="key.sh"><span class="icon material-symbols-outlined">deployed_code_update</span>Update Keybox <div class="spinner"></div></button>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <h3 class="group-title">Tricky Store</h3>
+        <div class="button-grid">
+          <button class="btn" data-script="systemuser.sh" data-type="scanner"><span class="icon material-symbols-outlined">adb</span>Target All Apps <div class="spinner"></div></button>
+          <button class="btn" data-script="user.sh" data-type="scanner"><span class="icon material-symbols-outlined">android</span>Target User Apps <div class="spinner"></div></button>
+          <button class="btn" data-script="keybox.sh"><span class="icon material-symbols-outlined">vpn_key</span>Set Valid Keybox <div class="spinner"></div></button>
+          <button class="btn" data-script="aosp.sh"><span class="icon material-symbols-outlined">vpn_key_off</span>Set AOSP Keybox <div class="spinner"></div></button>
+          <button class="btn" data-script="patch.sh"><span class="icon material-symbols-outlined">security</span>Spoof Tricky Patch <div class="spinner"></div></button>
+		  <button class="btn" data-script="banned.sh"><span class="icon material-symbols-outlined">dangerous</span>Banned Keybox List <div class="spinner"></div></button>
+        </div>
+      </div>
+
+      <div class="button-group">
         <h3 class="group-title">SusFS</h3>
         <div class="button-grid">
           <button class="btn" data-script="sus.sh" data-type="scanner"><span class="icon material-symbols-outlined">terminal</span>Update SusFS Config <div class="spinner"></div></button>
@@ -136,73 +128,65 @@
         </div>
       </div>
 	  
-<!--
-      <div class="button-group">
-        <h3 class="group-title">Diagnostics</h3>
-        <div class="button-grid">
-          <button class="btn" data-script="abnormal.sh" data-type="scanner"><span class="icon material-symbols-outlined">overview</span>Abnormal Detection <div class="spinner"></div></button>
-          <button class="btn" data-script="app.sh" data-type="scanner"><span class="icon material-symbols-outlined">microbiology</span>Flagged Apps <div class="spinner"></div></button>
-          <button class="btn" data-script="prop.sh" data-type="scanner"><span class="icon material-symbols-outlined">emergency_heat</span>Props Detection <div class="spinner"></div></button>
-        </div>
-      </div>
-
       <div class="button-group">
         <h3 class="group-title">Custom ROM Spoofer</h3>
         <div class="button-grid">
-          <button class="btn" data-script="resetprop.sh"><span class="icon material-symbols-outlined">mode_fan</span>Enable ROM's Inbuilt GMS Spoofing <div class="spinner"></div></button>
-          <button class="btn" data-script="setprop.sh"><span class="icon material-symbols-outlined">mode_fan_off</span>Hide PIF Detection <div class="spinner"></div></button>
+          <button class="btn" data-script="setprop.sh"><span class="icon material-symbols-outlined">mode_fan</span>Enable ROM's Inbuilt GMS Spoofing <div class="spinner"></div></button>
+          <button class="btn" data-script="resetprop.sh"><span class="icon material-symbols-outlined">mode_fan_off</span>Hide PIF Detection <div class="spinner"></div></button>
           <button class="btn" data-script="pixelos.sh"><span class="icon material-symbols-outlined">adb</span>PixelOS Spoofing <div class="spinner"></div></button>
           <button class="btn" data-script="xiaomi.sh"><span class="icon material-symbols-outlined">adb</span>Xiaomi EU Spoofing <div class="spinner"></div></button>
           <button class="btn" data-script="helluva.sh"><span class="icon material-symbols-outlined">adb</span>HentaiOS Spoofing <div class="spinner"></div></button>
           <button class="btn" data-script="derpfest.sh"><span class="icon material-symbols-outlined">adb</span>Derpfest Spoofing <div class="spinner"></div></button>
         </div>
       </div>
--->        
+	  
       <div class="button-group">
-        <h3 class="group-title">Community & Support</h3>
+        <h3 class="group-title">Diagnostics</h3>
         <div class="button-grid">
-          <button class="btn" data-script="support"><span class="icon material-symbols-outlined">volunteer_activism</span>Support the Developer <div class="spinner"></div></button>
-<!--
-          <button class="btn" data-script="meowverse.sh"><span class="icon material-symbols-outlined">send</span>Update Channel <div class="spinner"></div></button>
-        <div class="button-grid">
--->
-          <button class="btn" data-script="meowdump.sh"><span class="icon material-symbols-outlined">diversity_3</span>Help Group <div class="spinner"></div></button>
-          <button class="btn" data-script="report.sh"><span class="icon material-symbols-outlined">bug_report</span>Report A Bug/Problem <div class="spinner"></div></button>
-          <button class="btn" data-script="info.sh"><span class="icon material-symbols-outlined">code</span>Source Code <div class="spinner"></div></button>
-        </div>
-      </div>
-<!--
-      <div class="button-group">
-        <h3 class="group-title">Miscellaneous</h3>
-        <div class="button-grid">
-          <button class="btn" data-script="selinux.sh"><span class="icon material-symbols-outlined">bolt</span>Change SELinux Status <div class="spinner"></div></button>
-          <button class="btn" data-script="module_info.sh" data-type="scanner"><span class="icon material-symbols-outlined">print</span>Module Info<div class="spinner"></div></button>
-		<div class="button-grid">
-          <button class="btn" data-script="resize.sh"><span class="icon material-symbols-outlined">web</span>Resize WebUI <div class="spinner"></div></button>
-          <button class="btn" data-script="modal.sh" data-type="scanner"><span class="icon material-symbols-outlined">book</span>Modal Auto Close Switch<div class="spinner"></div></button>
+          <button class="btn" data-script="abnormal.sh" data-type="scanner"><span class="icon material-symbols-outlined">bug_report</span>Abnormal Detection <div class="spinner"></div></button>
+          <button class="btn" data-script="app.sh" data-type="scanner"><span class="icon material-symbols-outlined">microbiology</span>Flagged Apps <div class="spinner"></div></button>
+          <button class="btn" data-script="prop.sh" data-type="scanner"><span class="icon material-symbols-outlined">emergency_heat</span>Props Detection <div class="spinner"></div></button>
         </div>
       </div>
 
       <div class="button-group">
+        <h3 class="group-title">Community & Support</h3>
+        <div class="button-grid">
+          <button class="btn" data-script="support"><span class="icon material-symbols-outlined">volunteer_activism</span>Support the Developer <div class="spinner"></div></button>
+          <button class="btn" data-script="meowdump.sh"><span class="icon material-symbols-outlined">send</span>Update Channel <div class="spinner"></div></button>
+        <div class="button-grid">
+          <button class="btn" data-script="meowverse.sh"><span class="icon material-symbols-outlined">diversity_3</span>Help Group <div class="spinner"></div></button>
+          <button class="btn" data-script="info.sh"><span class="icon material-symbols-outlined">code</span>Source Code <div class="spinner"></div></button>
+          <button class="btn" data-script="report.sh"><span class="icon material-symbols-outlined">error</span>Report A Bug/Problem <div class="spinner"></div></button>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <h3 class="group-title">Miscellaneous</h3>
+        <div class="button-grid">
+ <!--          <button class="btn" data-script="selinux.sh"><span class="icon material-symbols-outlined">bolt</span>Change SELinux Status <div class="spinner"></div></button>
+ -->
+          <button class="btn" data-script="module_info.sh" data-type="scanner"><span class="icon material-symbols-outlined">print</span>Module Info<div class="spinner"></div></button>
+		<div class="button-grid">
+          <button class="btn" data-script="resize.sh"><span class="icon material-symbols-outlined">web</span>Resize WebUI <div class="spinner"></div></button>
+ <!--         <button class="btn" data-script="modal.sh" data-type="scanner"><span class="icon material-symbols-outlined">book</span>Modal Auto Close Switch<div class="spinner"></div></button> -->
+        </div>
+      </div>
+      
+      <div class="button-group">
         <h3 class="group-title">Extra</h3>
         <div class="button-grid">
         <button class="btn" data-script="game.sh" data-type="game"><span class="icon material-symbols-outlined">games</span>Play Game<div class="spinner"></div></button>
-        <button class="btn" data-script="font.sh"><span class="icon material-symbols-outlined">serif</span>Change font<div class="spinner"></div></button>
+<!--        <button class="btn" data-script="font.sh"><span class="icon material-symbols-outlined">serif</span>Change font<div class="spinner"></div></button> -->
         <button class="btn" data-script="intro.sh"><span class="icon material-symbols-outlined">switch</span>Enable/Disable WEBUI Intro<div class="spinner"></div></button>
+        <button class="btn" data-script="webui.sh"><span class="icon material-symbols-outlined">compare</span>Unhide/Hide Extra WebUI Features <div class="spinner"></div></button>
+        <button class="btn" data-script="mona" data-type="flags"><span class="icon material-symbols-outlined">bolt</span>Control Center<div class="spinner"></div></button>
 	   <div class="button-grid">
       </div>
       </div>
--->
-      <div class="button-group">
-        <h3 class="group-title">Extra Features</h3>
-        <div class="button-grid">
-          <button class="btn" data-script="resetprop.sh"><span class="icon material-symbols-outlined">mode_fan_off</span>Hide PIF Detection <div class="spinner"></div></button>
-          <button class="btn" data-script="mona" data-type="flags"><span class="icon material-symbols-outlined">bolt</span>Control Center<div class="spinner"></div></button>
-          <button class="btn" data-script="webui.sh"><span class="icon material-symbols-outlined">compare</span>Unhide/Hide Extra WebUI Features <div class="spinner"></div></button>
-        </div>
     </main>
   </div>
-      
+
   <div id="modal-backdrop" class="hidden">
     <div id="modal-content">
       <div id="modal-header">

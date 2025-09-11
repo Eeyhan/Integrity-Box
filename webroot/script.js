@@ -1,5 +1,5 @@
-const MODDIR = "/data/adb/modules/integrity_box/webroot/common_scripts";
-const PROP = `/data/adb/modules/integrity_box/module.prop`;
+const MODDIR = "/data/adb/modules/zygisk/webroot/common_scripts";
+const PROP = `/data/adb/modules/zygisk/module.prop`;
 let modalBackdrop = document.getElementById("modal-backdrop");
 let modalTitle = document.getElementById("modal-title");
 let modalOutput = document.getElementById("modal-output");
@@ -110,14 +110,14 @@ function closeModal() {
 async function getModuleName() {
   try {
     const name = await runShell(`grep '^name=' ${PROP} | cut -d= -f2`);
-    const t = (name || "").trim() || "integrity_box";
+    const t = (name || "").trim() || "IntegrityBox";
     const el = document.getElementById("module-name");
     if (el) el.textContent = t;
     document.title = t;
   } catch {
     const el = document.getElementById("module-name");
-    if (el) el.textContent = "integrity_box";
-    document.title = "integrity_box";
+    if (el) el.textContent = "IntegrityBox";
+    document.title = "IntegrityBox";
   }
 }
 
@@ -291,7 +291,7 @@ const SCRIPT_POPUPS = {
   "resetprop.sh": { start: "Done, Reopen detector to check", success: "Done, Reopen detector to check", type: "info" },
   "report.sh": { start: "Contacting Developer", success: "Contacting Developer", type: "info" },
   "prop.sh": { start: "Prop Dump Completed", success: "Prop Dump Completed", type: "info" },
-  "piffork.sh": { start: "Done! Click again to revert changes", success: "Done! Click again to revert changes", type: "info" },
+  "piffork": { start: "All changes will be applied immediately", success: "All changes will be applied immediately", type: "info" },
   "pif.sh": { start: "Done!", success: "Done!", type: "info" },
   "patch.sh": { start: "Done! Click again to revert changes", success: "Done! Click again to revert changes", type: "info" },
   "module_info.sh": { start: "Read it properly", success: "Read it properly", type: "info" },
@@ -310,7 +310,10 @@ const SCRIPT_POPUPS = {
   "selinux.sh": { start: "SELinux Status Changed", success: "SELinux Status Changed", type: "info" },
   "boot_hash.sh": { start: "Paste it here", success: "Boot hash operation complete", type: "success" },
   "game.sh": { start: "LAUNCHING GAME", success: "Game launched", type: "info" },
-  "font.sh": { start: "Re-Open WebUI to apply changes", success: "Re-Open WebUI to apply changes", type: "info" }
+  "font.sh": { start: "Re-Open WebUI to apply changes", success: "Re-Open WebUI to apply changes", type: "info" },
+  "intro.sh": { start: "Re-Open WebUI to apply changes", success: "Re-Open WebUI to apply changes", type: "info" },
+  "webui.sh": { start: "Re-Open WebUI to apply changes", success: "Re-Open WebUI to apply changes", type: "info" },
+  "mona": { start: "Changes will be applied on reboot", success: "Changes will be applied on reboot", type: "info" }
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -413,6 +416,32 @@ document.addEventListener("DOMContentLoaded", async () => {
           modalOutput.appendChild(gf);
           popup(mapping.start, mapping.type);
           return;
+        } else if (type === "piffork") {
+          const gf = document.createElement("iframe");
+          gf.src = "./PlayIntegrityFork/index.html";
+          gf.style.border = "none";
+          gf.style.width = "100%";
+          gf.style.height = "100%";
+          gf.style.flex = "1";
+          gf.style.borderRadius = "0";
+          openModal("", "", true);
+          modalOutput.innerHTML = "";
+          modalOutput.appendChild(gf);
+          popup(mapping.start, mapping.type);
+          return;
+        } else if (type === "flags") {
+          const gf = document.createElement("iframe");
+          gf.src = "./Flags/index.html";
+          gf.style.border = "none";
+          gf.style.width = "100%";
+          gf.style.height = "100%";
+          gf.style.flex = "1";
+          gf.style.borderRadius = "0";
+          openModal("", "", true);
+          modalOutput.innerHTML = "";
+          modalOutput.appendChild(gf);
+          popup(mapping.start, mapping.type);
+          return;
         } else if (script === "support") {
   const content = `<style>
 .donate-modal *{font-family:inherit;box-sizing:border-box}
@@ -438,8 +467,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 }
 
 .supporter-avatar {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--accent);
@@ -514,7 +543,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   <div style="margin-top:1.5rem;font-size:0.95rem;text-align:center;font-weight:600">🌟 Supporters 🌟</div>
   <div class="supporter-card">
-    <img src="https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/DUMP/paw7.png" alt="Anonymous" class="supporter-avatar" />
+    <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Anonymous" class="supporter-avatar" />
     <div class="supporter-info">
       <div class="supporter-name">Anonymous</div>
       <div class="supporter-donation">Donated: $1,000</div>
@@ -522,7 +551,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   </div>
   
   <div class="supporter-card">
-    <img src="https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/DUMP/paw7.png" alt="Jane Smith" class="supporter-avatar" />
+    <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="William Jane" class="supporter-avatar" />
     <div class="supporter-info">
       <div class="supporter-name">William Jane</div>
       <div class="supporter-donation">Donated: $200</div>
@@ -530,21 +559,125 @@ document.addEventListener("DOMContentLoaded", async () => {
   </div>
 
   <div class="supporter-card">
-    <img src="https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/DUMP/paw7.png" alt="John Doe" class="supporter-avatar" />
+    <img src="https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/Robert.jpg" alt="Robert" class="supporter-avatar" />
+    <div class="supporter-info">
+      <div class="supporter-name">Robert</div>
+      <div class="supporter-donation">Donated: $100</div>
+    </div>
+  </div>
+  
+  <div class="supporter-card">
+    <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Muhammad Fahad" class="supporter-avatar" />
     <div class="supporter-info">
       <div class="supporter-name">Muhammad Fahad</div>
       <div class="supporter-donation">Donated: $85</div>
     </div>
   </div>
 
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Mateo García" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Mateo García</div>
+    <div class="supporter-donation">Donated: $75</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Tariq Hassan" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Tariq Hassan</div>
+    <div class="supporter-donation">Donated: $100</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Liam O'Sullivan" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Liam O'Sullivan</div>
+    <div class="supporter-donation">Donated: $60</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Akio Tanaka" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Akio Tanaka</div>
+    <div class="supporter-donation">Donated: $80</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Andrei Petrov" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Andrei Petrov</div>
+    <div class="supporter-donation">Donated: $130</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Kwame Mensah" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Kwame Mensah</div>
+    <div class="supporter-donation">Donated: $50</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Niko Dimitrov" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Niko Dimitrov</div>
+    <div class="supporter-donation">Donated: $90</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Mohammed Al-Farsi" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Mohammed Al-Farsi</div>
+    <div class="supporter-donation">Donated: $70</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Jean Dupont" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Jean Dupont</div>
+    <div class="supporter-donation">Donated: $60</div>
+  </div>
+</div>
+
+<div class="supporter-card">
+  <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Rajiv Mehta" class="supporter-avatar" />
+  <div class="supporter-info">
+    <div class="supporter-name">Rajiv Mehta</div>
+    <div class="supporter-donation">Donated: $110</div>
+  </div>
+</div>
+
   <div class="supporter-card">
-    <img src="https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/DUMP/paw7.png" alt="Jane Smith" class="supporter-avatar" />
+    <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Abhinav Singh" class="supporter-avatar" />
     <div class="supporter-info">
       <div class="supporter-name">Abhinav Singh</div>
+      <div class="supporter-donation">Donated: $50</div>
+    </div>
+  </div>
+  
+  <div class="supporter-card">
+    <img src="https://cdn.dribbble.com/userupload/10843376/file/original-248680dabe5bc22679fba9d666801606.png?resize=1600x1200&vertical=center" alt="Abhishek Singh" class="supporter-avatar" />
+    <div class="supporter-info">
+      <div class="supporter-name">Abhishek Sharma</div>
       <div class="supporter-donation">Donated: $45</div>
     </div>
   </div>
 
+  <div class="supporter-card">
+    <img src="https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/tenma.jpg" alt="Dr. Tenma" class="supporter-avatar" />
+    <div class="supporter-info">
+      <div class="supporter-name">Dr. Tenma</div>
+      <div class="supporter-donation">Donated: $10</div>
+    </div>
+  </div>
+  
 </div>`;
           openModal("Support the Developer", content, true);
           setTimeout(() => {
