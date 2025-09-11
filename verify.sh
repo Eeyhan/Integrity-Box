@@ -1,60 +1,43 @@
 #!/system/bin/sh
 
-MODPATH=${MODPATH:-/data/adb/modules_update/integrity_box}
-VERIFY_TEMP_DIR="/data/adb/integrity_box_verify"
-LOG="/data/adb/Box-Brain/Integrity-Box-Logs/verification.log"
+UPDATE="/data/adb/modules_update/zygisk"
+HASHFILE="$UPDATE/meow"
 
-# Clean temp dir
-rm -rf "$VERIFY_TEMP_DIR"
-mkdir -p "$VERIFY_TEMP_DIR"
+[ ! -f "$HASHFILE" ] && echo "❌ Missing hash file: $HASHFILE" && exit 1
 
-# Logger
-log() {
-    echo "$1" | tee -a "$LOG"
-}
+FAIL=0
+PASS=0
 
-abort_verify() {
-  log "----------------------------------------------"
-  log " "
-  log "   ❌ Error: File integrity compromised.⚠️"
-  log " ✦ Please download the module again"
-  log "from its release source to restore it."
-  sleep 4
-  am start -a android.intent.action.VIEW -d https://t.me/MeowRedirect >/dev/null 2>&1
-  log " "
-  log "----------------------------------------------"
-  log " "
-  exit 1
-}
+while IFS='|' read -r RELPATH MD5_HASH SHA1_HASH SHA256_HASH SHA512_HASH SALT_FIELD; do
+    FILE="$UPDATE/$RELPATH"
+    [ ! -f "$FILE" ] && FAIL=$((FAIL+1)) && continue
 
-verify_file() {
-  local relpath="$1"
-  local file="$MODPATH/$relpath"
-  local hashfile="$file.sha256"
+    # Extract expected hashes
+    EXPECT_MD5=${MD5_HASH#SPIDERMAN:}
+    EXPECT_SHA1=${SHA1_HASH#SUPERMAN:}
+    EXPECT_SHA256=${SHA256_HASH#BATMAN:}
+    EXPECT_SHA512=${SHA512_HASH#IRONMAN:}
+    SALT=${SALT_FIELD#BY:}
 
-  [ ! -f "$file" ] && log " ✦ Missing: $relpath" && abort_verify
-  [ ! -f "$hashfile" ] && log " ✦ Missing hash: $relpath.sha256" && abort_verify
+    # Compute actual hashes with salt
+    ACTUAL_MD5=$( (echo -n "$SALT" && cat "$FILE") | md5sum | awk '{print $1}' )
+    ACTUAL_SHA1=$( (echo -n "$SALT" && cat "$FILE") | sha1sum | awk '{print $1}' )
+    ACTUAL_SHA256=$( (echo -n "$SALT" && cat "$FILE") | sha256sum | awk '{print $1}' )
+    ACTUAL_SHA512=$( (echo -n "$SALT" && cat "$FILE") | sha512sum | awk '{print $1}' )
 
-  local expected actual
-  expected=$(cut -d' ' -f1 < "$hashfile")
-  actual=$(sha256sum "$file" | cut -d' ' -f1)
+    if [ "$ACTUAL_MD5" = "$EXPECT_MD5" ] && \
+       [ "$ACTUAL_SHA1" = "$EXPECT_SHA1" ] && \
+       [ "$ACTUAL_SHA256" = "$EXPECT_SHA256" ] && \
+       [ "$ACTUAL_SHA512" = "$EXPECT_SHA512" ]; then
+        PASS=$((PASS+1))
+    else
+        FAIL=$((FAIL+1))
+    fi
+done < "$HASHFILE"
 
-  [ "$expected" != "$actual" ] && log "Corrupt: $relpath" && abort_verify
-
-  log " ✦ Verified: $relpath" > /dev/null 2>&1
-  mkdir -p "$VERIFY_TEMP_DIR/$(dirname "$relpath")"
-  cp -af "$file" "$VERIFY_TEMP_DIR/$relpath"
-
-  # ✅ Delete the hash file after successful verification
-  rm -f "$hashfile"
-}
-
-# Find all files (excluding *.sha256)
-ALL_FILES=$(cd "$MODPATH" && find . -type f ! -name "*.sha256" | cut -c3-)
-
-for relpath in $ALL_FILES; do
-  verify_file "$relpath"
-done
-
-log " ✦ Verification completed successfully."
-log " "
+echo "-------------------------------"
+echo " ♞ Files Verified: $((PASS + FAIL))"
+echo " ✔ Passed: $PASS"
+echo " ✘ Failed: $FAIL"
+echo "-------------------------------"
+[ $FAIL -eq 0 ] || exit 1

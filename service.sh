@@ -8,15 +8,81 @@ NOHELLO_WHITELIST="$NOHELLO_DIR/whitelist"
 LOG_DIR="/data/adb/Box-Brain/Integrity-Box-Logs"
 LOG="$LOG_DIR/service.log"
 
-# Logger
+# Logger function
 log() {
-    echo "$1" | tee -a "$LOG"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') | $1" | tee -a "$LOG"
 }
 
 # Check for Magisk presence
 is_magisk() {
     [ -d /data/adb/magisk ] || getprop | grep -q 'magisk'
 }
+
+# Module install path
+export MODPATH="/data/adb/modules/zygisk"
+
+NO_LINEAGE_FLAG="/data/adb/Box-Brain/NoLineageProp"
+
+# Only run if NoLineageProp exists
+if [ -f "$NO_LINEAGE_FLAG" ]; then
+    log "NoLineageProp flag detected. Starting LineageOS prop cleanup."
+
+    # Remove LineageOS props (by @ez-me)
+    log "Deleting LineageOS build props..."
+    resetprop --delete ro.lineage.build.version
+    resetprop --delete ro.lineage.build.version.plat.rev
+    resetprop --delete ro.lineage.build.version.plat.sdk
+    resetprop --delete ro.lineage.device
+    resetprop --delete ro.lineage.display.version
+    resetprop --delete ro.lineage.releasetype
+    resetprop --delete ro.lineage.version
+    resetprop --delete ro.lineagelegal.url
+    log "LineageOS props deleted."
+
+    # Create system.prop from build info
+    TMP_PROP="$MODPATH/tmp.prop"
+    SYSTEM_PROP="$MODPATH/system.prop"
+
+    log "Generating temporary prop file..."
+    getprop | grep "userdebug" > "$TMP_PROP"
+    getprop | grep "test-keys" >> "$TMP_PROP"
+    getprop | grep "lineage_" >> "$TMP_PROP"
+
+    log "Sanitizing temporary prop file..."
+    sed -i 's///g' "$TMP_PROP"
+    sed -i 's/: /=/g' "$TMP_PROP"
+    sed -i 's/userdebug/user/g' "$TMP_PROP"
+    sed -i 's/test-keys/release-keys/g' "$TMP_PROP"
+    sed -i 's/lineage_//g' "$TMP_PROP"
+
+    log "Sorting and creating final system.prop..."
+    sort -u "$TMP_PROP" > "$SYSTEM_PROP"
+    rm -f "$TMP_PROP"
+    log "system.prop created at $SYSTEM_PROP."
+
+    log "Waiting 30 seconds before applying props..."
+    sleep 30
+
+    log "Applying props via resetprop..."
+    resetprop -n --file "$SYSTEM_PROP"
+    log "LineageOS prop cleanup completed successfully ✅"
+else
+    log "NoLineageProp flag not found. Skipping LineageOS prop cleanup."
+fi
+
+#!/bin/sh
+
+if [ -f /data/adb/Box-Brain/selinux ]; then
+    if command -v setenforce >/dev/null 2>&1; then
+        current=$(getenforce)
+        if [ "$current" != "Enforcing" ]; then
+            setenforce 1
+            log "SELINUX Spoofed successfully"
+        fi
+    fi
+fi
+
+sh /data/adb/Box-Brain/Integrity-Box-Logs/description.sh
 
 # Initial states
 shamiko_prev=""
@@ -70,33 +136,3 @@ while true; do
   fi
   sleep 4
 done &
-
-# Module install path
-export MODPATH="/data/adb/modules/integrity_box"
-
-# Remove LineageOS props (by @ez-me)
-resetprop --delete ro.lineage.build.version
-resetprop --delete ro.lineage.build.version.plat.rev
-resetprop --delete ro.lineage.build.version.plat.sdk
-resetprop --delete ro.lineage.device
-resetprop --delete ro.lineage.display.version
-resetprop --delete ro.lineage.releasetype
-resetprop --delete ro.lineage.version
-resetprop --delete ro.lineagelegal.url
-
-# Create system.prop from build info
-getprop | grep "userdebug" >> "$MODPATH/tmp.prop"
-getprop | grep "test-keys" >> "$MODPATH/tmp.prop"
-getprop | grep "lineage_"  >> "$MODPATH/tmp.prop"
-
-sed -i 's///g'  "$MODPATH/tmp.prop"
-sed -i 's/: /=/g' "$MODPATH/tmp.prop"
-sed -i 's/userdebug/user/g' "$MODPATH/tmp.prop"
-sed -i 's/test-keys/release-keys/g' "$MODPATH/tmp.prop"
-sed -i 's/lineage_//g' "$MODPATH/tmp.prop"
-
-sort -u "$MODPATH/tmp.prop" > "$MODPATH/system.prop"
-rm -f "$MODPATH/tmp.prop"
-
-sleep 30
-resetprop -n --file "$MODPATH/system.prop"

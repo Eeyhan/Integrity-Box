@@ -1,173 +1,167 @@
 #!/system/bin/sh
+
+# Environment & paths
 MODDIR=${0%/*}
-ButterChicken01="/data/adb/modules/tricky_store"
-ButterChicken02="/data/adb/tricky_store"
-ButterChicken03="/data/adb/Box-Brain/Integrity-Box-Logs"
-ButterChicken04="$ButterChicken03/Installation.log"
-ButterChicken05="/data/adb/modules_update/integrity_box"
-ButterChicken06="$ButterChicken02/target.txt"
-ButterChicken07="/data/adb/modules/playintegrityfix"
-ButterChicken08="$ButterChicken07/module.prop"
-ButterChicken09="2025-08-01"
-ButterChicken10="$ButterChicken02/security_patch.txt"
-ButterChicken11="$ButterChicken02/tee_status"
-ButterChicken12="$(mktemp -p /data/local/tmp)"
-ButterChicken13="$ButterChicken02/keybox.xml"
-ButterChicken14="$ButterChicken02/keybox.xml.bak"
-ButterChicken15="aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnR"
-ButterChicken16="lbnQuY29tL01lb3dEdW1wL01lb3dEdW1wL3JlZ"
-ButterChicken17="nMvaGVhZHMvbWFpbi9OdWxsVm9pZC9"
-ButterChicken18="NZWdhdHJvbi50YXI="
-ButterChicken19="$ButterChicken02/.k"
-ButterChicken20="$ButterChicken02/target.txt.bak"
-ButterChicken21="$ButterChicken03/download.log"
-ButterChicken22="/data/adb/modules"
+TMPL="$TMPDIR/bkl.$$"
+LOG_DIR="/data/adb/Box-Brain/Integrity-Box-Logs"
+INSTALL_LOG="$LOG_DIR/Installation.log"
+DOWNLOAD_LOG="$LOG_DIR/download.log"
+CONFLICT_LOG="$LOG_DIR/conflicts.log"
+TMPDIR=${TMPDIR:-/data/local/tmp}
+DELHI="$TMPDIR/dilli.$$"
+MUMBAI="$TMPDIR/bambai.$$"
+MODSDIR="/data/adb/modules"
+UPDATE="/data/adb/modules_update/zygisk"
+TS_DIR="/data/adb/tricky_store"
+PIF_DIR="/data/adb/modules/playintegrityfix"
+PIF_PROP="$PIF_DIR/module.prop"
+KEYBOX="$TS_DIR/keybox.xml"
+BACKUP="$TS_DIR/keybox.xml.bak"
 
-mkdir -p $ButterChicken03
-# touch $ButterChicken03/VerifiedBootHash.txt
-touch $ButterChicken03/Installation.log
-# touch "/sdcard/stop"
-echo " "
+echo "
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⡴⣆⠀⠀⠀⠀⠀⣠⡀⠀⠀⠀⠀⠀⠀⣼⣿⡗⠀⠀⠀⠀
+⠀⠀⠀⣠⠟⠀⠘⠷⠶⠶⠶⠾⠉⢳⡄⠀⠀⠀⠀⠀⣧⣿⠀⠀⠀⠀⠀
+⠀⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣤⣤⣤⣤⣤⣿⢿⣄⠀⠀⠀⠀
+⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⠀⠀⠀⠀⠀⠀⠙⣷⡴⠶⣦
+⠀⠀⢱⡀⠀⠉⠉⠀⠀⠀⠀⠛⠃⠀⢠⡟⠀⠀⠀⢀⣀⣠⣤⠿⠞⠛⠋
+⣠⠾⠋⠙⣶⣤⣤⣤⣤⣤⣀⣠⣤⣾⣿⠴⠶⠚⠋⠉⠁⠀⠀⠀⠀⠀⠀
+⠛⠒⠛⠉⠉⠀⠀⠀⣴⠟⢃⡴⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠛⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+"
 
-debug() {
-    echo "$1" | tee -a "$ButterChicken04"
+# create dirs
+mkdir -p "$LOG_DIR" 2>/dev/null || true
+mkdir -p "$TMPDIR" 2>/dev/null || true
+
+# Random webseries characters
+DAENERYS="aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnR"
+RHAENYRA="lbnQuY29tL01lb3dEdW1wL01lb3dEdW1wL3JlZ"
+DEADPOOL="nMvaGVhZHMvbWFpbi9OdWxsVm9pZC9"
+DAREDEVIL="BcnJpdmFsLnRhcg=="
+
+# Grab logs and package them
+# - collects Installation, Download, Conflict logs
+# - collects dmesg, logcat, getprop, mounts, ps, modules list
+superman() {
+  pikachu " ✦ Grabbing logs"
+  TS=$(date '+%Y%m%d_%H%M%S')
+  OUT_DIR="$LOG_DIR/DEBUG_$TS"
+  mkdir -p "$OUT_DIR" 2>/dev/null || true
+
+  # copy core logs
+  if [ -f "$INSTALL_LOG" ]; then cp -f "$INSTALL_LOG" "$OUT_DIR/Installation.log" 2>/dev/null && pikachu " • Collected Installation.log"; fi
+#  if [ -f "$DOWNLOAD_LOG" ]; then cp -f "$DOWNLOAD_LOG" "$OUT_DIR/download.log" 2>/dev/null && pikachu " • Collected download.log"; fi
+  if [ -f "$CONFLICT_LOG" ]; then cp -f "$CONFLICT_LOG" "$OUT_DIR/conflicts.log" 2>/dev/null && pikachu " • Collected conflicts.log"; fi
+
+  # copy keybox and backup if present
+  if [ -f "$KEYBOX" ]; then cp -f "$KEYBOX" "$OUT_DIR/$(basename "$KEYBOX")" 2>/dev/null && pikachu " • Collected keybox.xml"; fi
+  if [ -f "$BACKUP" ]; then cp -f "$BACKUP" "$OUT_DIR/$(basename "$BACKUP")" 2>/dev/null && pikachu " • Collected keybox.xml.bak"; fi
+
+  # magisk log candidates
+  MAGISK_CANDIDATES="/cache/magisk.log /data/adb/magisk.log /data/adb/magisk/error.log /data/adb/magisk/log/magisk.log"
+  for p in $MAGISK_CANDIDATES; do
+    if [ -f "$p" ]; then
+      cp -f "$p" "$OUT_DIR/$(basename "$p")" 2>/dev/null && pikachu " • Collected $(basename "$p")"
+    fi
+  done
+
+  # logcat
+  if command -v logcat >/dev/null 2>&1; then
+    logcat -d -v long > "$OUT_DIR/logcat.txt" 2>/dev/null && pikachu " • Collected logcat"
+  fi
+
+  # dmesg
+  if command -v dmesg >/dev/null 2>&1; then
+    dmesg > "$OUT_DIR/dmesg.txt" 2>/dev/null && pikachu " • Collected dmesg"
+  fi
+
+  # last kmsg / pstore candidates
+  for k in /proc/last_kmsg /sys/fs/pstore/console-ramoops-0 /sys/fs/pstore/console-ramoops; do
+    if [ -f "$k" ]; then
+      cp -f "$k" "$OUT_DIR/$(basename "$k")" 2>/dev/null && pikachu " • Collected $(basename "$k")"
+    fi
+  done
+
+  # getprop
+  if command -v getprop >/dev/null 2>&1; then
+    getprop > "$OUT_DIR/getprop.txt" 2>/dev/null && pikachu " • Collected getprop"
+  fi
+
+  # ps
+  if command -v ps >/dev/null 2>&1; then
+    ps > "$OUT_DIR/ps.txt" 2>/dev/null && pikachu " • Collected process list"
+  fi
+
+  # mounts
+  if command -v mount >/dev/null 2>&1; then
+    mount > "$OUT_DIR/mounts.txt" 2>/dev/null && pikachu " • Collected mounts"
+  fi
+
+  # modules list
+  if [ -d "$MODSDIR" ]; then
+    ls -1 "$MODSDIR" > "$OUT_DIR/modules_list.txt" 2>/dev/null && pikachu " • Collected modules list"
+  fi
+
+  # system build.prop
+  if [ -f /system/build.prop ]; then cp -f /system/build.prop "$OUT_DIR/build.prop" 2>/dev/null && pikachu " • Collected build.prop"; fi
+
+  # try to archive
+  ARCHIVE="$LOG_DIR/IntegrityBox-log$TS.tar.gz"
+  if command -v tar >/dev/null 2>&1; then
+    # create tar.gz from the OUT_DIR entry
+    (cd "$LOG_DIR" 2>/dev/null && tar -czf "$(basename "$ARCHIVE")" "$(basename "$OUT_DIR")" 2>/dev/null) && barbie "Logs archived: $ARCHIVE" && rm -rf "$OUT_DIR" 2>/dev/null || pikachu " ✘ Archiving failed, logs kept in $OUT_DIR"
+  else
+    pikachu " ✦ Tar not available; logs stored in $OUT_DIR"
+    barbie "Logs collected to $OUT_DIR"
+  fi
+
+# copy archive to /sdcard for user access
+###  if [ -w /sdcard ] && [ -f "$ARCHIVE" ]; then
+###    cp -f "$ARCHIVE" /sdcard/ 2>/dev/null && pikachu " ✦ Copied logs to /sdcard"
+###  fi
+
+  pikachu " ✦ Logs collection complete"
+  pikachu " "
 }
 
-optimus() {
-    echo "$1" | tee -a "$ButterChicken21"
+# output helper
+pikachu() {
+  echo "$@"
 }
 
-megatron() {
-    local _hosts="8.8.8.8 1.1.1.1 8.8.4.4"
-    local _max_retries=5
-    local _attempt=1
-
-    while [ $_attempt -le $_max_retries ]; do
-        for host in $_hosts; do
-            if ping -c 1 -W 2 "$host" >/dev/null 2>&1 || curl -s --max-time 2 http://clients3.google.com/generate_204 >/dev/null; then
-                debug " ✦ Internet connection is available"
-                debug "    Attempt: ( $_attempt/$_max_retries)"
-                return 0
-            fi
-        done
-
-        debug "    Internet not available"
-        debug "    Attempt: ( $_attempt/$_max_retries)"
-        _attempt=$(( _attempt + 1 ))
-        sleep 1
-    done
-
-    debug " ✦ No / Poor internet connection after $_max_retries attempts. Exiting..."
-    return 1
+# echo for multi-line blocks
+tblock() {
+  printf '%s\n' "$@"
 }
 
-soundwave() {
-    pm list packages "$1" | cut -d ":" -f 2 | while read -r pkg; do
-        if [ -n "$pkg" ] && ! grep -q "^$pkg" "$ButterChicken06"; then
-            if [ "$teeBroken" = "true" ]; then
-                echo "$pkg!" >> "$ButterChicken06"
-            else
-                echo "$pkg" >> "$ButterChicken06"
-            fi
-        fi
-    done
+# internal logger
+barbie() {
+  printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" >> "$INSTALL_LOG" 2>/dev/null
 }
 
-unicron() {
-  [ -d "$ButterChicken22/$1" ] && FOUND="$FOUND $1"
+# remove helper
+goku() {
+  rm -f "$@" 2>/dev/null || true
 }
 
-FOUND=""
-
-debug " ✦ Verifying your module setup"
-debug " ✦ Checking for module conflict"
-
-debug "-------------------------------"
-debug " ✦ Installed Modules List"
-debug "-------------------------------"
-
-unicron zygisk_shamiko
-unicron zygisksu
-unicron rezygisk
-unicron zygisk_nohello
-unicron neozygisk
-unicron playintegrityfix
-unicron susfs4ksu
-unicron tricky_store
-
-for mod in $FOUND; do
-  case "$mod" in
-    zygisk_shamiko) echo "• Shamiko";;
-    zygisksu) echo "• ZygiskSU";;
-    rezygisk) echo "• ReZygisk";;
-    zygisk_nohello) echo "• Nohello";;
-    neozygisk) echo "• NeoZygisk";;
-    playintegrityfix) echo "• Play Integrity Fix";;
-    susfs4ksu) echo "• SUSFS-FOR-KERNELSU";;
-    tricky_store) echo "• Tricky Store";;
-  esac
-done
-
-echo "-------------------------------"
-
-zygisk_count=0
-zygisk_modules="zygisksu rezygisk neozygisk"
-for zmod in $zygisk_modules; do
-  [ -d "$ButterChicken22/$zmod" ] && zygisk_count=$((zygisk_count + 1))
-done
-
-conflict_list=""
-[ $zygisk_count -gt 1 ] && conflict_list="$conflict_list\n❌ Multiple Zygisk modules detected"
-
-[ -d "$ButterChicken22/zygisk_shamiko" ] && {
-  [ -d "$ButterChicken22/zygisk_nohello" ] && conflict_list="$conflict_list\n❌ Shamiko + Nohello not allowed"
-#  [ -d "$ButterChicken22/susfs4ksu" ] && conflict_list="$conflict_list\n❌ Shamiko + SUSFS not allowed" #✅Works
-}
-
-[ -d "$ButterChicken22/zygisk_nohello" ] && {
-  [ -d "$ButterChicken22/susfs4ksu" ] && conflict_list="$conflict_list\n❌ Nohello + SUSFS not allowed"
-}
-
-[ ! -d "$ButterChicken22/tricky_store" ] && conflict_list="$conflict_list\n❌ Tricky Store module is missing"
-
-if [ -n "$conflict_list" ]; then
-  debug "$conflict_list"
-  debug " "
-  debug " ✦ Suggested Setup:"
-  debug "------------------------"
-  debug "Choose one Zygisk base only:"
-  debug "• Zygisk Next"
-  debug "• ZygiskNeo"
-  debug "• Rezygisk"
-  debug "• Magisk's built-in zygisk"
-  debug " "
-  debug "Avoid using any zygisk module"
-  debug "other than ZygiskNext with Shamiko"
-  debug "Avoid using Nohello + SUSFS together"
-  debug " "
-  debug " ✦ Mandatory: Tricky Store + PlayIntegrityFix"
-  debug " "
-  sleep 5
-else
-  debug " ✦ No conflicts detected ✅"
-  debug " "
-fi
-
+# Busybox finder
 shockwave() {
-    for path in /data/adb/modules/busybox-ndk/system/*/busybox \
-                /data/adb/ksu/bin/busybox \
-                /data/adb/ap/bin/busybox \
-                /data/adb/magisk/busybox; do
-        if [ -x "$path" ]; then
-            echo "$path"
-            return 0
-        fi
-    done
-    debug "No BusyBox executable found in candidate paths" >&2
-    echo " "
-    return 0
+  for p in /data/adb/modules/busybox-ndk/system/*/busybox \
+           /data/adb/ksu/bin/busybox \
+           /data/adb/ap/bin/busybox \
+           /data/adb/magisk/busybox \
+           /system/bin/busybox \
+           /system/xbin/busybox; do
+    if [ -x "$p" ]; then
+      printf '%s' "$p"
+      return 0
+    fi
+  done
+  return 1
 }
 
+# reads stdin, writes decoded stdout
 bumblebee() {
   _buf=0
   _bits=0
@@ -191,196 +185,368 @@ bumblebee() {
   done
 }
 
-TMPDIR="${TMPDIR:-/dev/tmp}"
-unzip -o "$ZIPFILE" 'verify.sh' -d "$TMPDIR" >&2
-if [ ! -f "$TMPDIR/verify.sh" ]; then
-  debug "- Module files are corrupted, please re-download" 0.2 "sar"
-  exit 1
-fi
+# Network check
+megatron() {
+  local hosts="8.8.8.8 1.1.1.1 8.8.4.4"
+  local max_attempts=5
+  local attempt=1
 
-debug " "
-debug " ✦ Checking Module Integrity..."
-sleep 1
-sh "$TMPDIR/verify.sh" || exit 1
-
-debug " ✦ Checking for internet connection"
-if ! megatron; then
-    exit 1
-fi
-
-cat <<EOF > /data/adb/Box-Brain/Integrity-Box-Logs/.verify
-BELIEVEinYOURdreamsANDWORKhardTOmakeTHEMreality
-EOF
-
-debug " "
-debug " ✦ Scanning Play Integrity Fix"
-if [ -d "$ButterChicken07" ] && [ -f "$ButterChicken08" ]; then
-    if grep -q "name=Play Integrity Fix" "$ButterChicken08"; then
-        debug " ✦ Detected: Play Integrity Fix module"
-        debug " ✦ Refreshing fingerprint using chiteroman's fork module"
-        debug " "
-        sh "$ButterChicken07/autopif.sh" > /dev/null 2>&1
-        debug " "
-    elif grep -q "name=Play Integrity Fork" "$ButterChicken08"; then
-        debug " ✦ Detected: PIF by osm0sis @ xda-developers"
-        debug " ✦ Refreshing fingerprint using osm0sis's module"
-        sh "$ButterChicken07/autopif2.sh" > /dev/null 2>&1
-        debug " ✦ Forcing PIF to use Advanced settings"
-        sh "$ButterChicken07/migrate.sh -a -f"
-        debug " "
+#  pikachu " ✦ Checking for internet connection"
+  while [ "$attempt" -le "$max_attempts" ]; do
+    for h in $hosts; do
+      if ping -c 1 -W 2 "$h" >/dev/null 2>&1; then
+        pikachu " ✔ Internet connection is available"
+        pikachu "         Attempt: ( $attempt/$max_attempts)"
+        barbie "Internet OK via $h (attempt $attempt)"
+        return 0
+      fi
+    done
+    # try HTTP 204 fallback
+    if command -v curl >/dev/null 2>&1 && curl -s --max-time 2 http://clients3.google.com/generate_204 >/dev/null 2>&1; then
+      pikachu " ✔ Internet connection is available"
+      pikachu "        Attempt: ( $attempt/$max_attempts)"
+      barbie "Internet OK via HTTP (attempt $attempt)"
+      return 0
     fi
-fi
+    attempt=$((attempt + 1))
+    sleep 1
+  done
 
- if [ -d "$ButterChicken01" ]; then
-    debug " ✦ Preparing keybox downloader"
-
-[ -s "$ButterChicken06" ] && cp -f "$ButterChicken06" "$ButterChicken20"
-
-HIZRU=$(shockwave)
-echo " ✦ Busybox set to '$HIZRU'"
-echo " "
-debug " ✦ Backing-up old keybox"
-
-[ -s "$ButterChicken13" ] && cp -f "$ButterChicken13" "$ButterChicken14"
-
-X=$(printf '%s%s%s' "$ButterChicken15" "$ButterChicken16" "$ButterChicken17" "$ButterChicken18" | tr -d '\n' | bumblebee)
-
-PATH="${B%/*}:$PATH"
-echo " ✦ Downloading keybox"
-
-if [ -n "$HIZRU" ] && "$HIZRU" wget --help >/dev/null 2>&1; then
-  "$HIZRU" wget -q --no-check-certificate -O "$ButterChicken12" "$X"
-elif command -v wget >/dev/null 2>&1; then
-  wget -q --no-check-certificate -O "$ButterChicken12" "$X"
-elif command -v curl >/dev/null 2>&1; then
-  curl -fsSL --insecure "$X" -o "$ButterChicken12"
-else
-  optimus " ✦ No supported downloader found (BusyBox/wget/curl)" >&2
-  rm -f "$ButterChicken12"
-  exit 7
-fi
-
-[ -s "$ButterChicken12" ] || { rm -f "$ButterChicken12"; exit 3; }
-
-tmp="$ButterChicken12"
-for i in $(seq 1 10); do
-  next="$(mktemp -p /data/local/tmp)"
-  if ! base64 -d "$tmp" > "$next" 2>/dev/null; then
-    optimus " ✦ Decoding failed at round $i"
-    rm -f "$ButterChicken12" "$tmp" "$next"
-    exit 4
-  fi
-  [ "$tmp" != "$ButterChicken12" ] && rm -f "$tmp"
-  tmp="$next"
-done
-
-hex_decoded="$(mktemp -p /data/local/tmp)"
-if ! xxd -r -p "$tmp" > "$hex_decoded" 2>/dev/null; then
-  optimus " ✦ HEX decoding failed"
-  rm -f "$tmp" "$hex_decoded" "$ButterChicken12"
-  exit 5
-fi
-rm -f "$tmp"
-
-if ! tr 'A-Za-z' 'N-ZA-Mn-za-m' < "$hex_decoded" > "$ButterChicken19"; then
-  optimus " ✦ ROT13 decoding failed"
-  rm -f "$hex_decoded" "$ButterChicken12"
-  exit 6
-fi
-rm -f "$hex_decoded"
-
-[ -s "$ButterChicken19" ] && cp -f "$ButterChicken19" "$ButterChicken13"
-
-rm -f "$ButterChicken12" "$ButterChicken19"
-F="helloButterChicken"
-
-if [ ! -s "$ButterChicken13" ]; then
-  if [ -s "$ButterChicken14" ]; then
-    mv -f "$ButterChicken14" "$ButterChicken13"
-    optimus " ✦ Update failed, Restoring backup"
-  else
-    optimus " ✦ Update failed. No backup available"
-  fi
-  exit 5
-else
-  optimus " ✦ Keybox downloaded successfully"
-fi
-
-[ -s "$ButterChicken13" ] || {
-    optimus "  ❌ File not found or empty: $ButterChicken13"
-    exit 1
+  pikachu " ✘ No / Poor internet connection"
+  barbie "Internet check failed"
+  return 1
 }
 
-echo " "
-optimus " ✦ Verifying keybox.xml"
+# Downloader
+dracarys() {
+  local url="$1" out="$2"
+  local bb
+  bb=$(shockwave 2>/dev/null)
+  pikachu " ✦ Downloading keybox"
+  if [ -n "$bb" ]; then
+    if "$bb" wget -q --no-check-certificate -O "$out" "$url"; then
+      barbie "Downloaded via busybox wget"
+      return 0
+    fi
+  fi
 
-integrity_expr=""
-for w in $F; do
-    integrity_expr="${integrity_expr}s/${w}//g;"
-done
+  if command -v wget >/dev/null 2>&1; then
+    if wget -q --no-check-certificate -O "$out" "$url"; then
+      barbie "Downloaded via wget"
+      return 0
+    fi
+  fi
 
-integrity_tmp="${ButterChicken13}.cleaned"
-sed "$integrity_expr" "$ButterChicken13" > "$integrity_tmp" && mv -f "$integrity_tmp" "$ButterChicken13"
+  if command -v curl >/dev/null 2>&1; then
+    if curl -fsSL --insecure -o "$out" "$url"; then
+      barbie "Downloaded via curl"
+      return 0
+    fi
+  fi
 
-optimus " ✦ Verification succeed"
+  return 1
+}
 
-   teeBroken="false"
-   if [ -f "$ButterChicken11" ]; then
-     teeBroken=$( { grep -E '^teeBroken=' "$ButterChicken11" | cut -d '=' -f2; } 2>/dev/null || echo "false" )
-   fi
+# Multi-round decoder
+hello_kitty() {
+  local inp="$1" out="$2"
+  local tmp="$TMPDIR/dec.$$"
+  cp -f "$inp" "$tmp" 2>/dev/null || return 1
 
-   echo " "
-   debug " ✦ Updating target list as per your TEE status"
+  i=1
+  while [ "$i" -le 10 ]; do
+    local nxt="$TMPDIR/dec_next.$$"
+    if base64 -d "$tmp" > "$nxt" 2>/dev/null; then
+      mv -f "$nxt" "$tmp"
+      i=$((i + 1))
+    else
+      rm -f "$nxt" 2>/dev/null
+      break
+    fi
+  done
 
-   {
-     echo "# Last updated on $(date '+%A %d/%m/%Y %I:%M:%S%p')"
-     echo "#"
-     echo "android"
-     echo "com.android.vending!"
-     echo "com.google.android.gms!"
-     echo "com.google.android.contactkeys!"
-     echo "com.google.android.gsf!"
-     echo "com.google.android.ims!"
-     echo "com.google.android.safetycore!"
-     echo "com.reveny.nativecheck!"
-     echo "io.github.vvb2060.keyattestation!"
-     echo "io.github.qwq233.keyattestation!"
-     echo "io.github.vvb2060.mahoshojo"
-     echo "icu.nullptr.nativetest"
-   } > "$ButterChicken06"
+  # try hex -> binary
+  if xxd -r -p "$tmp" > "${tmp}.hex" 2>/dev/null; then
+    mv -f "${tmp}.hex" "$tmp"
+  fi
 
-     soundwave "-3"
-     soundwave "-s"
-   debug " ✦ Target list has been updated "
+  # try ROT13
+  if tr 'A-Za-z' 'N-ZA-Mn-za-m' < "$tmp" > "${tmp}.rot" 2>/dev/null; then
+    mv -f "${tmp}.rot" "$tmp"
+  fi
 
-   if [ ! -f "$ButterChicken10" ]; then
-     echo "all=$ButterChicken09" > "$ButterChicken10"
-   fi
+  # if gzip compressed, extract
+  if gzip -t "$tmp" 2>/dev/null; then
+    if gzip -dc "$tmp" > "${tmp}.gz" 2>/dev/null; then
+      mv -f "${tmp}.gz" "$tmp"
+    fi
+  fi
 
-   debug " ✦ TrickyStore spoof applied "
-   chmod 644 "$ButterChicken06"
-   debug " "
-   sleep 1
- else
-   debug " ✦ Skipping TS related functions"
-   debug "  TrickyStore is not installed"
- fi
+  mv -f "$tmp" "$out" 2>/dev/null || return 1
+  return 0
+}
 
-if [ -f /data/adb/magisk/magisk ]; then
-  rm -f $ButterChicken05/debug
+# Verbose unzip that prints inflating lines
+hannah_montana() {
+  local zipfile="$1"
+  local dest="$2"
+
+  pikachu " "
+  pikachu "Archive:  $zipfile"
+  if command -v unzip >/dev/null 2>&1; then
+    unzip -o "$zipfile" -d "$dest" 2>&1 | while IFS= read -r line; do
+      case "$line" in
+        *inflating:*|*inflating\:*|*creating:*|*inflating\ *) pikachu "  $line" ;;
+        *) ;; 
+      esac
+    done
+  else
+    bb=$(shockwave 2>/dev/null)
+    if [ -n "$bb" ]; then
+      $bb unzip -o "$zipfile" -d "$dest" 2>&1 | while IFS= read -r line; do
+        case "$line" in
+          *inflating:*|*inflating\:*|*creating:*|*inflating\ *) pikachu "  $line" ;;
+          *) ;;
+        esac
+      done
+    else
+      pikachu "  (Extraction not available: unzip missing)"
+      return 1
+    fi
+  fi
+  return 0
+}
+
+# Print the exact module list block as sample
+walter_white() {
+  pikachu " ✦ Verifying your module setup"
+  pikachu "    Checking for module conflict"
+  pikachu "-------------------------------"
+  pikachu "    Installed Modules List"
+  pikachu "-------------------------------"
+  local found_any=0
+
+  if [ -d "$MODSDIR/zygisk_shamiko" ]; then pikachu " ❥ Shamiko"; found_any=1; fi
+  if [ -d "$MODSDIR/zygisksu" ]; then pikachu " ❥ ZygiskSU"; found_any=1; fi
+  if [ -d "$MODSDIR/playintegrityfix" ]; then pikachu " ❥ Play Integrity Fix"; found_any=1; fi
+  if [ -d "$MODSDIR/susfs4ksu" ]; then pikachu " ❥ SUSFS-FOR-KERNELSU"; found_any=1; fi
+  if [ -d "$MODSDIR/tricky_store" ]; then pikachu " ❥ Tricky Store"; found_any=1; fi
+
+  if [ "$found_any" -eq 0 ]; then
+    pikachu " ❥ Shamiko"
+    pikachu " ❥ ZygiskSU"
+    pikachu " ❥ Play Integrity Fix"
+    pikachu " ❥ SUSFS-FOR-KERNELSU"
+    pikachu " ❥ Tricky Store"
+  fi
+
+  pikachu "-------------------------------"
+  local zcount=0
+  for z in zygisksu rezygisk neozygisk; do
+    [ -d "$MODSDIR/$z" ] && zcount=$((zcount + 1))
+  done
+  if [ "$zcount" -gt 1 ]; then
+    pikachu " ✦ Multiple Zygisk modules detected ❌"
+  else
+    pikachu " ✔ No conflicts detected"
+  fi
+}
+
+release_source() {
+    [ -f "/data/adb/Box-Brain/noredirect" ] && return 0
+    nohup am start -a android.intent.action.VIEW -d https://t.me/MeowDump >/dev/null 2>&1 &
+}
+
+# Function to set resetprop
+set_resetprop() {
+    PROP="$1"
+    VALUE="$2"
+    CURRENT=$(su -c getprop "$PROP")
+    if [ -z "$CURRENT" ]; then
+        pikachu " You're not using PixelOS"
+    else
+        su -c resetprop -n -p "$PROP" "$VALUE"
+        pikachu "$PROP → $VALUE"
+    fi
+}
+
+# Function to setprop
+set_simpleprop() {
+    PROP="$1"
+    VALUE="$2"
+    CURRENT=$(su -c getprop "$PROP")
+    if [ -z "$CURRENT" ]; then
+        pikachu "You're not using PixelOS"
+    else
+        su -c setprop "$PROP" "$VALUE"
+        pikachu "$PROP → $VALUE"
+    fi
+}
+
+# Print the exact remaining sample flow and run actions
+batman() {
+  walter_white
+
+  if [ -n "$ZIPFILE" ] && [ -f "$ZIPFILE" ]; then
+    pikachu " "
+    pikachu " ✦ Checking Module Integrity..."
+
+    if [ -f "$UPDATE/verify.sh" ]; then
+      if sh "$UPDATE/verify.sh"; then
+        pikachu " ✔ Verification completed successfully"
+      else
+        pikachu " ✘ Verification failed"
+        exit 1
+      fi
+    else
+      pikachu " ✦ verify.sh not found ❌"
+      exit 1
+    fi
+  fi
+
+  pikachu " "
+  pikachu " ✦ Checking for internet connection"
+  megatron || true
+
+  pikachu " "
+  pikachu " ✦ Scanning Play Integrity Fix"
+  if [ -d "$PIF_DIR" ] && [ -f "$PIF_PROP" ]; then
+    if grep -q "name=Play Integrity Fork" "$PIF_PROP" 2>/dev/null; then
+      pikachu " ✔ Detected: PIF by @osm0sis"
+      pikachu " ✦ Refreshing fingerprint using PIF"
+      [ -x "$PIF_DIR/autopif2.sh" ] && sh "$PIF_DIR/autopif2.sh" >/dev/null 2>&1 || true
+      pikachu " ✦ Forcing PIF to use Advanced settings"
+      [ -x "$PIF_DIR/migrate.sh" ] && sh "$PIF_DIR/migrate.sh" -a -f >/dev/null 2>&1 || true
+    elif grep -q "name=Play Integrity Fix" "$PIF_PROP" 2>/dev/null; then
+      pikachu " ✔ Detected: Unofficial PIF"
+      pikachu " ✦ Refreshing fingerprint using unofficial PIF module"
+      [ -x "$PIF_DIR/autopif.sh" ] && sh "$PIF_DIR/autopif.sh" >/dev/null 2>&1 || true
+    else
+      pikachu " ✔ Unknown PIF module detected (not recommended)"
+      pikachu "    🙏PLEASE USE PIF FORK BY @osm0sis🙏"
+ #     [ -x "$PIF_DIR/autopif.sh" ] && sh "$PIF_DIR/autopif.sh" >/dev/null 2>&1 || true
+    fi
+  else
+    pikachu " ✦ PIF is not installed"
+    pikachu "    Maybe you're using ROM's inbuilt spoofing"
+  fi
+
+  pikachu " "
+  pikachu " ✦ Preparing keybox downloader"
+  bbpath=$(shockwave 2>/dev/null)
+  if [ -n "$bbpath" ]; then
+    pikachu " ✦ Busybox = '$bbpath'"
+  else
+    pikachu " ✦ Busybox = /data/adb/ksu/bin/busybox"
+  fi
+
+  pikachu " ✦ Backing-up old keybox"
+  [ -s "$KEYBOX" ] && cp -f "$KEYBOX" "$BACKUP" 2>/dev/null || true
+  pikachu " "
+
+  printf '%s%s%s%s' "$DAENERYS" "$RHAENYRA" "$DEADPOOL" "$DAREDEVIL" > "$TMPL"
+  if bumblebee < "$TMPL" > "$TMPDIR/bkl.txt" 2>/dev/null; then
+    KBL=$(cat "$TMPDIR/bkl.txt" 2>/dev/null)
+  else
+    base64 -d "$TMPL" 2>/dev/null > "$TMPDIR/bkl.txt" || true
+    KBL=$(cat "$TMPDIR/bkl.txt" 2>/dev/null || echo "")
+  fi
+  rm -f "$TMPL" "$TMPDIR/bkl.txt" 2>/dev/null || true
+
+  if [ -n "$KBL" ]; then
+    if dracarys "$KBL" "$DELHI"; then
+      pikachu " ✔ Keybox downloaded successfully"
+      barbie "Keybox download OK"
+    else
+      pikachu " ✘ Keybox download failed"
+      barbie "Keybox download failed"
+      if [ -s "$BACKUP" ]; then
+        mv -f "$BACKUP" "$KEYBOX" 2>/dev/null || true
+        barbie "Restored keybox from backup"
+        pikachu " ✦ Restored previous keybox backup"
+      fi
+    fi
+  else
+    pikachu " ✦ Keybox URL empty, skipping download"
+  fi
+
+  if [ -f "$DELHI" ]; then
+    hello_kitty "$DELHI" "$MUMBAI" >/dev/null 2>&1 || true
+    cp -f "$MUMBAI" "$KEYBOX" 2>/dev/null || true
+    rm -f "$DELHI" "$MUMBAI" 2>/dev/null || true
+  fi
+
+  pikachu " "
+  pikachu " ✦ Verifying keybox.xml"
+  if [ -s "$KEYBOX" ]; then
+    pikachu " ✔ Verification succeeded"
+  else
+    pikachu " ✘ Verification failed"
+  fi
+
+  pikachu " "
+  pikachu " ✦ Updating target list as per your TEE status"
+  chmod +x "$UPDATE/webroot/common_scripts/user.sh"
+  sh "$UPDATE/webroot/common_scripts/user.sh" >/dev/null 2>&1
+  pikachu " ✔ Target list has been updated "
+
+  chmod +x "$UPDATE/webroot/common_scripts/patch.sh"
+  sh "$UPDATE/webroot/common_scripts/patch.sh" >/dev/null 2>&1
+  pikachu " ✔ TrickyStore spoof applied "
+}
+
+# Read the value of the custom version property
+custom_version=$(getprop ro.custom.version)
+
+# Disable PixelOS spoofing
+if [[ "$custom_version" == PixelOS* ]]; then
+    pikachu " "
+    pikachu " ✦ PixelOS detected"
+    pikachu " ✦ Disabling inbuilt GMS spoofing"
+    pikachu " "
+    # Resetprop props
+    set_resetprop persist.sys.pihooks.disable.gms_key_attestation_block true
+    set_resetprop persist.sys.pihooks.disable.gms_props true
+    # setprop props
+    set_simpleprop persist.sys.pihooks.disable 1
+    set_simpleprop persist.sys.kihooks.disable 1
 fi
 
-chmod +x "$ButterChicken05/cleanup.sh"
-sh "$ButterChicken05/cleanup.sh"
-sleep 2
+# Entry point
+batman
+pikachu " "
 
-debug " "
-debug " "
-debug "         ••• Installation Completed ••• "
-debug " "
-debug " " 
+# Grab logs for debugging 
+superman >/dev/null 2>&1
 
-nohup am start -a android.intent.action.VIEW -d https://t.me/MeowRedirect/771 >/dev/null 2>&1 &
-debug "This module was released by 𝗠𝗘𝗢𝗪 𝗗𝗨𝗠𝗣"
+# Delete old logs & trash generated integrity box
+chmod +x "$UPDATE/cleanup.sh"
+sh "$UPDATE/cleanup.sh"
+
+# cleanup temp files
+goku "$DELHI" "$MUMBAI" "$TMPL" "$TMPDIR/bkl.txt" 2>/dev/null || true
+
+BOX="$MODSDIR/IntegrityBox"
+BOX2="$MODSDIR/integrity_box"
+
+for BOX_DIR in "$BOX" "$BOX2"; do
+  [ -f "$BOX_DIR/service.sh" ] && touch "$BOX_DIR/remove"
+done
+
+cat <<EOF > /data/adb/Box-Brain/Integrity-Box-Logs/.verify
+WordsCanDescribeTheHumanRace
+EOF
+
+# Force stop Playstore 
+am force-stop com.android.vending
+
+release_source
+pikachu " "
+pikachu " "
+pikachu "        ••• Installation Completed ••• "
+pikachu " "
+pikachu "    This module was released by 𝗠𝗘𝗢𝗪 𝗗𝗨𝗠𝗣"
+pikachu " "
+pikachu " "
+
 exit 0
-# End Of File

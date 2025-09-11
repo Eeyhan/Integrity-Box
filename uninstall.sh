@@ -1,7 +1,41 @@
-rm -rf /data/adb/Box-Brain/Integrity-Box-Logs
-rm -rf /data/adb/tricky_store/keybox.xml
-rm -rf /data/adb/tricky_store/target.txt
-rm -rf /data/adb/shamiko/whitelist
-rm -rf /data/adb/nohello/whitelist
-rm -rf /data/adb/service.d/debug.sh
-rm -rf /data/adb/modules/integrity_box
+TRICKY_STORE="/data/adb/tricky_store"
+KEYBOX="$TRICKY_STORE/keybox.xml"
+KEYBOX_BACKUP="$TRICKY_STORE/keybox.xml.bak"
+TARGET="$TRICKY_STORE/target.txt"
+TARGET_BACKUP="$TRICKY_STORE/target.txt.bak"
+
+if [ -e /data/adb/Box-Brain ]; then
+    rm -rf /data/adb/Box-Brain
+fi
+
+if [ -e "$KEYBOX" ]; then
+    rm -rf "$KEYBOX"
+fi
+
+if [ -e "$TARGET" ]; then
+    rm -rf "$TARGET"
+fi
+
+if [ -e /data/adb/shamiko/whitelist ]; then
+    rm -rf /data/adb/shamiko/whitelist
+fi
+
+if [ -e /data/adb/nohello/whitelist ]; then
+    rm -rf /data/adb/nohello/whitelist
+fi
+
+if [ -e /data/adb/service.d/debug.sh ]; then
+    rm -rf /data/adb/service.d/debug.sh
+fi
+
+if [ -e /data/adb/modules/zygisk ]; then
+    rm -rf /data/adb/modules/zygisk
+fi
+
+if [ -e "$TARGET_BACKUP" ]; then
+    mv "$TARGET_BACKUP" "$TARGET"
+fi
+
+if [ -e "$KEYBOX_BACKUP" ]; then
+    mv "$KEYBOX_BACKUP" "$KEYBOX"
+fi

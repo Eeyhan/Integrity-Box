@@ -1,9 +1,9 @@
-id=integrity_box
+id=zygisk
 name=Integrity Box 📦
-version=v15
-versionCode=1500
-author=github.com/MeowDump
-description=Remember, the world doesn’t revolve around Play Integrity, Android, or root. Life’s short! count every blessing and be happy for no reason. Have a great day 😊 
-updateJson=https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/IntegrityBox/release.json
+version=v19
+versionCode=1900
+author=𝗠𝗘𝗢𝗪𝗻𝗮 💅 || tg@MeowDump
+description=𝘈𝘭𝘸𝘢𝘺𝘴 𝘤𝘩𝘦𝘤𝘬 𝘱𝘭𝘢𝘺 𝘪𝘯𝘵𝘦𝘨𝘳𝘪𝘵𝘺 𝘧𝘳𝘰𝘮 𝘗𝘭𝘢𝘺𝘚𝘵𝘰𝘳𝘦'𝘴 𝘥𝘦𝘷𝘦𝘭𝘰𝘱𝘦𝘳 𝘰𝘱𝘵𝘪𝘰𝘯𝘴. | Uninstall playstore update & downgrade to v44.0.28-23_0 if you're unable to pass strong integrity
+updateJson=https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/zygisk/release.json
 support=https://t.me/MeowDump
-banner=meow
+banner=https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Banner/mona1.png
