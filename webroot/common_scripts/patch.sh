@@ -5,12 +5,8 @@ LOG="/data/adb/Box-Brain/Integrity-Box-Logs"
 LOGFILE="$LOG/patch.log"
 TARGET_DIR="/data/adb/tricky_store"
 FILE_PATH="$TARGET_DIR/security_patch.txt"
-FILE_CONTENT="all=2025-07-05"
-U="/data/adb/modules/integrity_box"
-
-# Execute kill script
-chmod +x "$U/kill.sh"
-sh "$U/kill.sh"
+FILE_CONTENT="all=2025-08-05"
+U="/data/adb/modules/zygisk"
 
 # Ensure log directory exists
 mkdir -p "$LOG"
@@ -21,7 +17,7 @@ log() { echo -e "$1" | tee -a "$LOGFILE"; }
 log "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 log " "
 log "Patch Mode : Auto"
-log "Spoofed to : 05 JULY 2025"
+log "Spoofed to : 05 August 2025"
 log "Applied on:  $(date '+%A %d/%m/%Y %I:%M:%S %p')"
 
 # Check if file exists to proceed
@@ -31,14 +27,15 @@ if [ ! -f "$FILE_PATH" ] && [ ! -d "$TARGET_DIR" ]; then
 fi
 
 # Toggle spoofing
-if [ -f "$FILE_PATH" ]; then
-    rm -f "$FILE_PATH"
-    log "Patch Status : ❌ Not Spoofed / Removed"
-else
+#if [ -f "$FILE_PATH" ]; then
+#    rm -f "$FILE_PATH"
+#    log "Patch Status : ❌ Not Spoofed / Removed"
+#else
     mkdir -p "$TARGET_DIR"
+    touch "$TARGET_DIR/security_patch.txt"
     echo "$FILE_CONTENT" > "$FILE_PATH"
     log "Patch Status : ✅ Spoofed"
-fi
+#fi
 
 log "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 log " "

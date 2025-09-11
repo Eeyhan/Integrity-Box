@@ -100,10 +100,6 @@ print_props "OEM / Bootloader State" \
     ro.oem_unlock_supported ro.boot.bootloader ro.boot.bootdevice \
     ro.boot.verifiedboot ro.boot.veritymode ro.boot.slot_suffix
 
-print_props "Timezone / Locale" \
-    persist.sys.timezone persist.sys.locale ro.product.locale \
-    ro.product.locale.language ro.product.locale.region
-
 # End
 log "- Prop Dump Complete ✅"
 echo -e "$R" >> "$L"

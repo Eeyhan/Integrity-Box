@@ -1,6 +1,6 @@
 #!/system/bin/sh
 
-SOURCE="/data/adb/modules/integrity_box/toolbox/keybox.xml"
+SOURCE="/data/adb/modules/zygisk/toolbox/keybox.xml"
 DEST_DIR="/data/adb/tricky_store"
 DEST_FILE="$DEST_DIR/keybox.xml"
 BACKUP_FILE="$DEST_DIR/keybox.xml.md"

@@ -1,75 +1,91 @@
 #!/bin/sh
 TARGET='/data/adb/tricky_store/target.txt'
+BACKUP='/data/adb/tricky_store/target.txt.bak'
 TEE_STATUS='/data/adb/tricky_store/tee_status'
+TRICKY_DIR='/data/adb/tricky_store'
+TMP="${TARGET}.new.$$"
+
+success=0
+made_backup=0
+
+cleanup() {
+    status=$?
+    if [ $success -ne 1 ]; then
+        [ -f "$TMP" ] && rm -f "$TMP"
+        if [ $made_backup -eq 1 ] && [ -f "$BACKUP" ]; then
+            echo "Restoring backup..."
+            mv -f "$BACKUP" "$TARGET"
+        fi
+    fi
+    exit $status
+}
+trap cleanup EXIT INT TERM HUP
 
 # Ensure TrickyStore directory exists
-if [ ! -d "/data/adb/tricky_store" ]; then
+if [ ! -d "$TRICKY_DIR" ]; then
     echo "- Please install Trickystore Module"
-    nohup am start -a android.intent.action.VIEW -d https://github.com/5ec1cff/TrickyStore/releases >/dev/null 2>&1 & 
+    am start -a android.intent.action.VIEW -d https://github.com/5ec1cff/TrickyStore/releases >/dev/null 2>&1 &
     echo "Redirecting to Github"
     exit 1
 fi
 
-# Ensure the target file directory exists
-mkdir -p /data/adb/tricky_store
-
-# Remove the target.txt file if it exists
-[ -f "$TARGET" ] && rm "$TARGET"
-
-# Read teeBroken value
-teeBroken="false"
-if [ -f "$TEE_STATUS" ]; then
-    teeBroken=$(grep -E '^teeBroken=' "$TEE_STATUS" | cut -d '=' -f2 2>/dev/null || echo "false")
+# Backup current target
+if [ -f "$TARGET" ]; then
+    mv -f "$TARGET" "$BACKUP" || exit 1
+    made_backup=1
+#    echo "Backed up to: $BACKUP"
 fi
 
-# Start writing the target list
-echo "# Last updated on $(date '+%A %d/%m/%Y %I:%M:%S%p')" > "$TARGET"
-echo "#" >> "$TARGET"
-echo "android" >> "$TARGET"
-echo "com.android.vending!" >> "$TARGET"
-echo "com.google.android.gms!" >> "$TARGET"
-echo "com.reveny.nativecheck!" >> "$TARGET"
-echo "io.github.vvb2060.keyattestation!" >> "$TARGET"
-echo "io.github.qwq233.keyattestation!" >> "$TARGET"
-echo "io.github.vvb2060.mahoshojo" >> "$TARGET"
-echo "icu.nullptr.nativetest" >> "$TARGET"
-echo "com.google.android.contactkeys!" >> "$TARGET"
-echo "com.google.android.gsf!" >> "$TARGET"
-echo "com.google.android.ims!" >> "$TARGET"
-echo "com.google.android.safetycore!" >> "$TARGET"
+# Read teeBroken value safely
+teeBroken="false"
+if [ -f "$TEE_STATUS" ]; then
+    v=$(grep -E '^teeBroken=' "$TEE_STATUS" 2>/dev/null | cut -d '=' -f2)
+    [ "$v" = "true" ] && teeBroken="true"
+fi
 
-echo "This may take a while, have patience☕"
-echo "- Updating target list as per your TEE status"
-
-# Function to add package names to target list
-add_packages() {
-    pm list packages "$1" | cut -d ":" -f 2 | while read -r pkg; do
-        if [ -n "$pkg" ] && ! grep -q "^$pkg" "$TARGET"; then
-            if [ "$teeBroken" = "true" ]; then
-                echo "$pkg!" >> "$TARGET"
-            else
-                echo "$pkg" >> "$TARGET"
-            fi
-        fi
-    done
+# Helper to add pkg with optional "!" for broken TEE devices
+add_pkg() {
+    pkg="$1"
+    if [ "$teeBroken" = "true" ]; then
+        echo "${pkg}!" >> "$TMP"
+    else
+        echo "$pkg" >> "$TMP"
+    fi
 }
 
-# Add user apps
-add_packages "-3"
+# Builder
+echo "# Last updated on $(date '+%A %d/%m/%Y %I:%M:%S%p')" > "$TMP" || exit 1
+echo "#" >> "$TMP"
 
-# Add system apps
-add_packages "-s"
+add_pkg "android"
+add_pkg "com.android.vending"
+add_pkg "com.google.android.gms"
+add_pkg "io.github.vvb2060.keyattestation"
+add_pkg "io.github.qwq233.keyattestation"
+add_pkg "io.github.vvb2060.mahoshojo"
+add_pkg "icu.nullptr.nativetest"
+add_pkg "com.google.android.contactkeys"
+add_pkg "com.google.android.ims"
+add_pkg "com.google.android.safetycore"
 
-# Display the result
-echo "- Updating target list"
-echo " "
-echo "-----------------------------------------------"
-echo "  All System & User Apps with TEE support"
-echo "-----------------------------------------------"
+# Append all (system + user) apps
+pm list packages 2>/dev/null | cut -d ":" -f 2 | while read -r pkg; do
+    [ -z "$pkg" ] && continue
+    # Skip Native Detector 
+    [ "$pkg" = "com.reveny.nativecheck" ] && continue
+    if ! grep -F -x -q "$pkg" "$TMP" && ! grep -F -x -q "$pkg!" "$TMP"; then
+        add_pkg "$pkg"
+    fi
+done
+
+# Swap in atomically
+mv -f "$TMP" "$TARGET" || exit 1
+success=1
+
+echo "Updating target list"
+echo
+echo "----------------------------------------------"
+echo "  All Packages (System + User) with TEE status"
+echo "----------------------------------------------"
 cat "$TARGET"
-echo "🤩 Updated target.txt"
-
-# su -c "am force-stop com.google.android.gms.unstable"
-# su -c "am force-stop com.android.vending"
-
 exit 0

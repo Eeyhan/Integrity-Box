@@ -106,26 +106,6 @@ log "$Q"
 log " "
 
 ####################################
-# TEE & DRM Integrity Check
-####################################
-log "- TEE & DRM Status"
-
-# Trusted Execution Environment
-grep -qE "trusty|tee" /proc/cmdline && log "   ├─ ✅ TEE Present" || log "   ├─ ⚠️ TEE Missing"
-[ -e /dev/tee0 ] && log "   ├─ ✅ TEE Device Node: /dev/tee0" || log "   ├─ ⚠️ No /dev/tee0"
-
-# Widevine DRM Level
-WIDEVINE=$(getprop ro.vendor.widevine.cdm.level)
-[ "$WIDEVINE" = "L1" ] && log "   ├─ ✅ Widevine Level: L1" || log "   ├─ ⚠️ Widevine Level: $WIDEVINE"
-
-# Verified Boot State
-VBS=$(getprop ro.boot.verifiedbootstate)
-[ "$VBS" = "green" ] && log "   └─ ✅ Verified Boot: Passed" || log "   └─ ⚠️ Verified Boot: $VBS"
-
-log "$Q"
-log " "
-
-####################################
 # END
 ####################################
 log "+ Detection Complete!\n"

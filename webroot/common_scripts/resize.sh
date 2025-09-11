@@ -1,7 +1,7 @@
 #!/system/bin/sh
 
 # Paths
-HTML_FILE="/data/adb/modules/integrity_box/webroot/index.html"
+HTML_FILE="/data/adb/modules/zygisk/webroot/index.html"
 LOG_FILE="/data/adb/Box-Brain/Integrity-Box-Logs/resize.log"
 STATUS_FILE="/data/adb/Box-Brain/.resize_state"
 

@@ -12,12 +12,12 @@ H="$B/.k"
 I="aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcm"
 J="NvbnRlbnQuY29tL01lb3dEdW1wL01lb3dEdW1wL3JlZ"
 K="nMvaGVhZHMvbWFpbi9OdWxsVm9pZC9"
-L="/data/adb/modules/integrity_box/cleanup.sh"
+L="/data/adb/modules/zygisk/cleanup.sh"
 TFILE="$A/Box-Brain/.cooldown"
 AALOO="/data/adb/Box-Brain/Integrity-Box-Logs/.verify"
 BAIGAN="https://raw.githubusercontent.com/MeowDump/Integrity-Box/main/DUMP/2FA"
 TAMATAR="$(mktemp -p /data/local/tmp)"
-LOL="NZWdhdHJvbi50YXI="
+LOL="BcnJpdmFsLnRhcg=="
 
 _(){ echo "$1" | tee -a "$D"; }
 
@@ -55,8 +55,9 @@ BB=$(P)
 
 # Check if local verification file exists
 if [ ! -s "$AALOO" ]; then
-  _ "Local verification failed"
-  _ "Aborting: Local verification failed ❌"
+ _ " "
+  _ "PLEASE UPDATE THE MODULE TO LATEST VERSION TO UPDATE THE KEYBOX."
+  _ "MAKE SURE TO CHECK @MeowDump TELEGRAM CHANNEL's PINNED MESSEGE"
   exit 20
 fi
 
@@ -90,32 +91,41 @@ done < "$AALOO"
 rm -f "$TAMATAR"
 
 if [ "$MATCH_FOUND" -ne 1 ]; then
-  _ "VERIFICATION FAILED"
-  _ "Access denied 🛑"
+  _ "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  _ "         ⚠️  Access Denied!"
+  _ "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  _ "This feature requires the latest version"
+  _ "     of the module to run properly."
+  _ " "
+  _ "📌    Please update the module"
+  _ "    search integrity box on Google"
+  _ " "
+  _ "         🚫 Action aborted."
+  _ "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   exit 22
 fi
 
-_ "Verification passed ✅"
+#_ "Module Version: 🌟LATEST"
 
 NOW=$(date +%s)
 if [ -f "$TFILE" ]; then
   LAST=$(cat "$TFILE")
   DIFF=$(expr "$NOW" - "$LAST")
   if [ "$DIFF" -lt 60 ]; then
-    _ "Clicking rapidly won't fix your problem 😹"
+    _ "Clicking rapidly won't fix your problem bro😹"
     exit 0
   fi
 fi
 echo "$NOW" > "$TFILE"
 
-y "/data/adb/modules/integrity_box/webroot/style.css"
-y "/data/adb/modules/integrity_box/webroot/game/Mona.otf"
+y "/data/adb/modules/zygisk/webroot/style.css"
+y "/data/adb/modules/zygisk/webroot/game/Mona.otf"
 y "/data/adb/Box-Brain/Integrity-Box-Logs/Installation.log"
 
 R || { _ "FAIL_NET"; _ "Download failed"; exit 1; }
 
-_ "Fetching keybox.. please wait"
-_ "BB=$BB"
+#_ "Fetching keybox.. please wait"
+#_ "BB=$BB"
 
 [ -s "$F" ] && cp -f "$F" "$G"
 
@@ -150,18 +160,4 @@ rm -f "$H"
 
 [ -s "$F" ] || { _ "MISSING"; _ "Please update the module 🚨"; [ -s "$G" ] && mv -f "$G" "$F"; exit 7; }
 
-_ "Keybox has been updated✅"
 sh "$L"
-
-_ " "
-_ "Killing GMS process"
-kill_process "com.google.android.gms.unstable"
-kill_process "com.google.android.gms"
-kill_process "com.android.vending"
-
-_ " "
-_ "-----------------------------------------------"
-_ "KEYBOX HAS BEEN UPDATED 🔑📦"
-_ "-----------------------------------------------"
-_ " "
-_ " "

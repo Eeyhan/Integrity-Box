@@ -54,12 +54,16 @@ meow "- Scanning system for Custom ROM detection.."
 # Search for traces in the specified directories
 for dir in /system /product /data /vendor /etc /root; do
     meow "- Searching in: $dir... "
-    find "$dir" -type f 2>/dev/null | grep -i -E "lineageos|crdroid|gapps|evolution|magisk" >> "$O"
+    find "$dir" -type f 2>/dev/null | grep -i -E "lineageos|crdroid|gapps|evolution|magisk|ksu" >> "$O"
 done
+
+meow " "
+meow " "
+cat "$O"
+meow " "
+meow " "
 
 chmod 644 "$O"
 meow "- Scan complete. & saved to sus list "
-
-meow "Make it SUS🥷"
 meow " "
 exit 0

@@ -1,6 +1,6 @@
 #!/system/bin/sh
 
-MODDIR="/data/adb/modules/integrity_box/toolbox"
+MODDIR="/data/adb/modules/zygisk/toolbox"
 MODULE_PROP="/data/adb/modules/playintegrityfix/module.prop"
 
 SRC_PIF="$MODDIR/pif.prop"
