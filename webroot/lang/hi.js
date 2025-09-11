@@ -38,7 +38,8 @@ export const translations = {
     "मॉड्यूल जानकारी",
     "WebUI का आकार बदलें",
     "मोडल ऑटो क्लोज़ स्विच",
-    "गेम खेलें"
+    "गेम खेलें",
+    "webui की एडवांस सेटिंग्स को छुपाएं/दिखाएं"
   ]
 };
 
@@ -52,7 +53,8 @@ export const buttonGroups = {
   "Check": { "hi": "डायग्नोस्टिक" },
   "Help": { "hi": "कम्युनिटी और सपोर्ट" },
   "Basic": { "hi": "सामान्य" },
-  "TimePass": { "hi": "खेल" }
+  "TimePass": { "hi": "खेल" },
+  "Extra": { "hi": "बाकी के" }
 };
 
 // [SECTION 3] There's nothing to translate in this section
@@ -65,5 +67,6 @@ export const buttonOrder = [
   "abnormal.sh", "app.sh", "prop.sh",
   "support", "meowdump.sh", "meowverse.sh", "info.sh", "report.sh",
   "selinux.sh", "module_info.sh", "resize.sh", "modal.sh",
-  "game.sh"
+  "game.sh",
+  "webui.sh"
 ];

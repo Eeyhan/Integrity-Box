@@ -38,7 +38,8 @@ export const translations = {
     "मॉड्यूलची माहिती",
     "WebUI रिसाईझ करा",
     "मॉडल ऑटो क्लोज स्विच",
-    "गेम खेळा"
+    "गेम खेळा",
+    "अन्य सेटिंग्स"
   ]
 };
 
@@ -65,5 +66,6 @@ export const buttonOrder = [
   "abnormal.sh", "app.sh", "prop.sh",
   "support", "meowdump.sh", "meowverse.sh", "info.sh", "report.sh",
   "selinux.sh", "module_info.sh", "resize.sh", "modal.sh",
-  "game.sh"
+  "game.sh",
+  "webui.sh"
 ];
